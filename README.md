@@ -1,17 +1,17 @@
-Coffee Tracker
+Inventory Tracker
 ==============
 
-A quick and dirty Sinatra app for tracking coffee consumption.
+A quick and dirty Sinatra app for tracking inventory consumption. This is a fork from [Coffee Tracker](http://github.com/pgaspar/Coffee-Tracker "Coffee Tracker") and came to be when we noticed we needed to track other stuff appart from coffee. Tea and sandwiches, for instances.
 
 We're using it at [Connect Coimbra](http://connectcoimbra.com/ "Connect Coimbra") with about 10 people.
 
-![Screenshot](http://dl.dropbox.com/u/562461/hot-linking/coffee_tracker_github.png "Front Page screen")
+![Screenshot (not up to date!)](http://dl.dropbox.com/u/562461/hot-linking/coffee_tracker_github.png "Front Page screen")
 
 Features
 --------
 
 * Users managed by the administrator
-* Each coffee drink is stored with a timestamp, the type of coffee and the price at time of consumption
+* Each record is stored with a timestamp, the type of item and the price at time of consumption
 * Overall stats displayed on the main page
 * Easily filter by month (not in the interface at the moment)
 * Extremely simple interface / idea
