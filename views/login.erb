@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Coffee Track</title>
+    <title><%= ENV['APP_FULL_NAME'] || "Inventory Tracker" %></title>
     <meta name="description" content="">
     <meta name="author" content="">
 
@@ -54,9 +54,9 @@
         
         <div style="margin-top: 45px">
           <% @users.each do |u| %>
-            <form action="login" method="post">
+            <form action="/login" method="post">
               <input type="hidden" name="id" value="<%= u.id %>">
-              <input type="hidden" name="action" value="<%= action %>">
+              <input type="hidden" name="prod_id" value="<%= prod_id %>">
               <input type="submit" value="<%= u.name %>" class="btn disabled large">
             </form>
           <% end %>

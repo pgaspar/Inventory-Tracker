@@ -33,20 +33,20 @@ class User
   
   # Some utility methods - naming sucks.
   
-  def drinks(type)
-    drinkRecords.all(:type => type)
+  def drinks(product)
+    drinkRecords.all(:product => product)
   end
   
-  def num_drinks(type)
-    drinkRecords.all(:type => type).size
+  def num_records(product)
+    drinkRecords.all(:product => product).size
   end
   
   def total_price
     sprintf "%.2f", drinkRecords.map(&:price).inject(:+) || 0 # Using sprintf to avoid weird float errors (0.5999999 instead of 0.6).
   end
   
-  def type_price(type)
-    sprintf "%.2f", drinks(type).map(&:price).inject(:+) || 0
+  def type_price(product)
+    sprintf "%.2f", drinks(product).map(&:price).inject(:+) || 0
   end
 end
 
@@ -54,10 +54,21 @@ class DrinkRecord
   include DataMapper::Resource
   property :id,           Serial
   property :created_at,   DateTime
-  property :type,         Enum[:intenso, :aromatico], :required => true   # Add new types here and on the views (they're hardcoded)
-  property :price,        Float, :default => 0.3
+  #property :type,         String, :required => true   # Add new types here and on the views (they're hardcoded)
+  property :price,        Float, :required => true
   
   belongs_to :user
+  belongs_to :product
+end
+
+class Product
+  include DataMapper::Resource
+  property :id,           Serial
+  property :name,         String, :required => true
+  property :price,        Float, :required => true
+  property :style,        String
+  
+  has n,   :drinkRecord
 end
 
 DataMapper.finalize
@@ -71,6 +82,7 @@ end
 
 get '/' do
   @users = User.all
+  @products = Product.all
   erb :index
 end
 
@@ -100,7 +112,7 @@ end
 
 post '/login' do
   session[:user] = User.get(params[:id]).id
-  call env.merge("PATH_INFO" => '/' + params[:action])
+  call env.merge("PATH_INFO" => '/product/' + params[:prod_id])
 end
 
 get '/logout' do
@@ -108,15 +120,16 @@ get '/logout' do
   redirect '/'
 end
 
-post '/:action' do |action|
-  halt 404 unless DrinkRecord::type.options[:set].include? action.to_sym
+post '/product/:id' do |id|
+  halt 404 if (prod = Product.get(id)).nil?
   
   unless @me
     @users = User.all
-    return erb :login, :locals => {:action => action}
+    return erb :login, :locals => {:prod_id => id}
   end
   
-  @me.drinkRecords.create(:type => action.to_sym)
+  @products = Product.all
+  @me.drinkRecords.create(:product => prod, :price => prod.price)
   
   erb :done, :locals => {:confirmation_msg => ["Registado.", "Ok, já apontei.", "Done.", "Agora vai trabalhar.", "E Red Bull, não?"].sample}
 end

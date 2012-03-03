@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title><%= ENV['APP_FULL_NAME'] || "Coffee Tracker" %></title>
+    <title><%= ENV['APP_FULL_NAME'] || "Inventory Tracker" %></title>
     <meta name="description" content="">
     <meta name="author" content="">
 
@@ -49,18 +49,16 @@
           <table class="table bordered-table">
             <thead>
               <tr>
-                <th colspan=2 style="text-align: center">O que já bebeste</th>
+                <th colspan=2 style="text-align: center">O que já consumiste</th>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td><b>Aromático</b></td>
-                <td><%= @me.num_drinks(:aromatico) %></td>
-              </tr>
-              <tr>
-                <td><b>Intenso</b</td>
-                <td><%= @me.num_drinks(:intenso) %></td>
-              </tr>
+              <% @products.each do |p| %>
+                <tr>
+                  <td><b><%= p.name %></b></td>
+                  <td><%= @me.num_records(p) %></td>
+                </tr>
+              <% end %>
               <tr>
                 <td><b>Total</b></td>
                 <td><%= @me.total_price %>€</td>

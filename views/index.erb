@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title><%= ENV['APP_FULL_NAME'] || "Coffee Tracker" %></title>
+    <title><%= ENV['APP_FULL_NAME'] || "Inventory Tracker" %></title>
     <meta name="description" content="">
     <meta name="author" content="">
 
@@ -66,11 +66,12 @@
       
       <!-- Main hero unit for a primary marketing message or call to action -->
       <div class="hero-unit">
-        <h1 style="text-align: center">Bebi um...</h1>
+        <h1 style="text-align: center">O que foste buscar?</h1>
         
         <div class="row" style="margin: 40px auto 0px auto; text-align: center">
-          <form method="post" action="/aromatico" style="display: inline"><input type="submit" value="Aromático" class="btn danger aromatico large" style="margin-right: 45px"></form>
-          <form method="post" action="/intenso" style="display: inline"><input type="submit" value="Intenso" class="btn danger intenso large"></form>
+          <% @products.each do |p| %>
+            <form method="post" action="/product/<%= p.id %>" style="display: inline"><input type="submit" value="<%= p.name %>" class="btn <%= p.style %> large" style="margin-right: 45px"></form>
+          <% end %>
         </div>
       </div>
       
@@ -81,8 +82,7 @@
           <thead>
             <tr>
               <th>Nome</th>
-              <th>Aromático</th>
-              <th>Intenso</th>
+              <% @products.each do |p| %><th><%= p.name %></th><% end %>
               <th>A pagar</th>
             </tr>
           </thead>
@@ -90,8 +90,9 @@
             <% @users.each do |u| %>
               <tr <%= "class='me'" if u == @me %>>
                 <td><%= u.name %></td>
-                <td><%= u.num_drinks(:aromatico) %></td>
-                <td><%= u.num_drinks(:intenso) %></td>
+                <% @products.each do |p| %>
+                  <td><%= u.num_records(p) %></td>
+                <% end %>
                 <td><%= u.total_price %>€</td>
               </tr>
             <% end %>
