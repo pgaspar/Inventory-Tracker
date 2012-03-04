@@ -70,7 +70,7 @@
         
         <div class="row" style="margin: 40px auto 0px auto; text-align: center">
           <% @products.each do |p| %>
-            <form method="post" action="/product/<%= p.id %>" style="display: inline"><input type="submit" value="<%= p.name %>" class="btn <%= p.style %> large" style="margin-right: 45px"></form>
+            <form method="post" action="/product/<%= p.id %>" style="display: inline"><input type="submit" value="<%= p.name %>" class="btn <%= p.style %> large" style="margin-top:10px;<%= "margin-right: 45px" unless p == @products.last %>"></form>
           <% end %>
         </div>
       </div>
