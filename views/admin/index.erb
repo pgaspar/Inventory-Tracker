@@ -1,4 +1,4 @@
-<form action="add" method="post" accept-charset="utf-8">
+<form action="/admin/users/add" method="post" accept-charset="utf-8">
   <input type="text" name="name" value="" id="name" placeholder="Name...">
   <input type="submit" value="Add User &rarr;">
 </form>
@@ -6,6 +6,20 @@
 Users: <br />
 <ul>
   <% @users.each do |u| %>
-    <li><a href="/admin/user/<%= u.id %>"><%= u.name %></a> <form action="remove" method="post" style="display: inline-block;"><input type="hidden" name="id" value="<%= u.id %>"><input type="submit" value="&times;" onclick="return confirm('Do you really want to delete?')"></form></li>
+    <li><a href="/admin/user/<%= u.id %>"><%= u.name %></a> <form action="/admin/user/<%= u.id %>/remove" method="post" style="display: inline-block;"><input type="submit" value="&times;" onclick="return confirm('Do you really want to delete?')"></form></li>
+  <% end %>
+</ul>
+
+<form action="/admin/products/add" method="post" accept-charset="utf-8">
+  <input type="text" name="name" value="" id="name" placeholder="Name...">
+  <input type="text" name="price" value="" id="price" placeholder="Price...">
+  <input type="text" name="style" value="" id="style" placeholder="Style...">
+  <input type="submit" value="Add Product &rarr;">
+</form>
+
+Products: <br />
+<ul>
+  <% @products.each do |p| %>
+    <li><a href="/admin/product/<%= p.id %>"><%= p.name %></a> <form action="/admin/product/<%= p.id %>/remove" method="post" style="display: inline-block;"><input type="submit" value="&times;" onclick="return confirm('Do you really want to delete?')"></form></li>
   <% end %>
 </ul>

@@ -1,14 +1,12 @@
 <h1><%= @user.name %></h1>
 
 <table border="1" cellspacing="0" cellpadding="4">
-  <tr>
-    <td><b>Aromático</b></td>
-    <td><%= @user.num_drinks(:aromatico) %></td>
-  </tr>
-  <tr>
-    <td><b>Intenso</b</td>
-    <td><%= @user.num_drinks(:intenso) %></td>
-  </tr>
+  <% @products.each do |p| %>
+    <tr>
+      <td><b><%= p.name %></b></td>
+      <td><%= @user.num_records(p) %></td>
+    </tr>
+  <% end %>
   <tr>
     <td><b>Total</b></td>
     <td><%= @user.total_price %>€</td>
@@ -27,11 +25,11 @@
     </tr>
   </thead>
   <tbody>
-    <% @user.drinkRecords.all(:order => [ :created_at.desc ]).each do |r| %>
+    <% @user.consumptionRecords.all(:order => [ :created_at.desc ]).each do |r| %>
     <tr>
       <td><%= r.id %></td>
       <td><%= r.created_at.to_time.utc %></td>
-      <td><%= r.type %></td>
+      <td><%= r.product.name %></td>
       <td><%= sprintf "%.2f", r.price %>€</td>
     </tr>
   <% end %>

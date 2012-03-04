@@ -1,0 +1,21 @@
+<h1><%= @product.name %></h1>
+
+<form action="/admin/product/<%= @product.id %>/edit" method="post" accept-charset="utf-8">
+  <table border="1" cellspacing="0" cellpadding="4">
+    <tr>
+      <td><b>Name</b></td>
+      <td><input type="text" name="name" value="<%= @product.name %>" id="name"></td>
+    </tr>
+    <tr>
+      <td><b>Price</b></td>
+      <td><input type="text" name="price" value="<%= @product.price %>" id="price"></td>
+    </tr>
+    <tr>
+      <td><b>Style</b></td>
+      <td><input type="text" name="style" value="<%= @product.style %>" id="style"></td>
+    </tr>
+    <tr>
+      <td colspan="2" style="text-align: center"><input type="submit" value="Save &rarr;"></td>
+    </tr>
+  </table>
+</form>

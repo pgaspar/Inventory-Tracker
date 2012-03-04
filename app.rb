@@ -23,34 +23,34 @@ class User
   property :id,           Serial
   property :name,         String
   
-  has n,   :drinkRecords
+  has n,   :consumptionRecords
   
-  def drinks_by_month(month, year)
+  def records_by_month(month, year)
     st_time = Date.new(year, month)
     fin_time = st_time.next_month
-    drinkRecords.all(:created_at => (st_time.to_time..fin_time.to_time))
+    consumptionRecords.all(:created_at => (st_time.to_time..fin_time.to_time))
   end
   
   # Some utility methods - naming sucks.
   
-  def drinks(product)
-    drinkRecords.all(:product => product)
+  def records(product)
+    consumptionRecords.all(:product => product)
   end
   
   def num_records(product)
-    drinkRecords.all(:product => product).size
+    consumptionRecords.all(:product => product).size
   end
   
   def total_price
-    sprintf "%.2f", drinkRecords.map(&:price).inject(:+) || 0 # Using sprintf to avoid weird float errors (0.5999999 instead of 0.6).
+    sprintf "%.2f", consumptionRecords.map(&:price).inject(:+) || 0 # Using sprintf to avoid weird float errors (0.5999999 instead of 0.6).
   end
   
   def type_price(product)
-    sprintf "%.2f", drinks(product).map(&:price).inject(:+) || 0
+    sprintf "%.2f", records(product).map(&:price).inject(:+) || 0
   end
 end
 
-class DrinkRecord
+class ConsumptionRecord
   include DataMapper::Resource
   property :id,           Serial
   property :created_at,   DateTime
@@ -68,7 +68,7 @@ class Product
   property :price,        Float, :required => true
   property :style,        String
   
-  has n,   :drinkRecord
+  has n,   :consumptionRecords
 end
 
 DataMapper.finalize
@@ -89,25 +89,51 @@ end
 get '/admin' do
   protected!
   @users = User.all
+  @products = Product.all
   erb :"admin/index"
 end
 
-post '/add' do
+post '/admin/users/add' do
   protected!
   User.create(:name => params[:name])
   redirect '/admin'
 end
 
-post '/remove' do
+post '/admin/user/:id/remove' do |id|
   protected!
-  User.get(params[:id]).destroy
+  User.get(id).destroy
   redirect '/admin'
 end
 
-get '/admin/user/:id' do
+get '/admin/user/:id' do |id|
   protected!
-  @user = User.get(params[:id])
+  @user = User.get(id)
+  @products = Product.all
   erb :"admin/user"
+end
+
+post '/admin/products/add' do
+  protected!
+  Product.create(:name => params[:name], :price => params[:price], :style => params[:style])
+  redirect '/admin'
+end
+
+post '/admin/product/:id/remove' do |id|
+  protected!
+  Product.get(id).destroy
+  redirect '/admin'
+end
+
+get '/admin/product/:id' do |id|
+  protected!
+  @product = Product.get(id)
+  erb :"admin/product"
+end
+
+post '/admin/product/:id/edit' do |id|
+  protected!
+  Product.get(id).update(:name => params[:name], :price => params[:price], :style => params[:style])
+  redirect '/admin'
 end
 
 post '/login' do
@@ -129,7 +155,7 @@ post '/product/:id' do |id|
   end
   
   @products = Product.all
-  @me.drinkRecords.create(:product => prod, :price => prod.price)
+  @me.consumptionRecords.create(:product => prod, :price => prod.price)
   
   erb :done, :locals => {:confirmation_msg => ["Registado.", "Ok, já apontei.", "Done.", "Agora vai trabalhar.", "E Red Bull, não?"].sample}
 end
