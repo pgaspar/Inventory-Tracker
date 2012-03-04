@@ -10,8 +10,8 @@ We're using it at [Connect Coimbra](http://connectcoimbra.com/ "Connect Coimbra"
 Features
 --------
 
-* Users managed by the administrator
-* Each record is stored with a timestamp, the type of item and the price at time of consumption
+* Users and Products managed on an admin section
+* Each record is stored with a timestamp, the product type and the price at time of consumption
 * Overall stats displayed on the main page
 * Easily filter by month (not in the interface at the moment)
 * Extremely simple interface / idea
@@ -25,7 +25,6 @@ The first version was stitched up in about 4 hours with KISS in mind, so there's
 
 * The login is cookie based but requires no password (the user selects himself from the list of users) - this doesn't scale and has privacy issues
 * The views are tightly coupled with our needs and are generally awful (I swear that inline css was already there!)
-* Hardcoded coffee types and prices
 * Site's copy currently in Portuguese
 
 Powered by
