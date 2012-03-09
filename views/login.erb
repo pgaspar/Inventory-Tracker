@@ -57,6 +57,7 @@
             <form action="/login" method="post">
               <input type="hidden" name="id" value="<%= u.id %>">
               <input type="hidden" name="prod_id" value="<%= prod_id %>">
+              <input type="hidden" name="quantity" value="<%= quantity %>">
               <input type="submit" value="<%= u.name %>" class="btn disabled large">
             </form>
           <% end %>

@@ -26,6 +26,7 @@
             $("ul", this).animate({top: '-60px'}, 200);
             num = 1;
           }
+          $("form > input.quantity").attr("value", num);
         });
 
         function slide_down(d) {
@@ -172,7 +173,10 @@
         
         <div class="row" style="margin: 40px auto 0px auto; text-align: center">
           <% @products.each do |p| %>
-            <form method="post" action="/product/<%= p.id %>" style="display: inline"><input type="submit" value="<%= p.name %>" class="btn <%= p.style %> large my-btn" style="margin-top:10px; <%= "margin-right: 45px" unless p == @products.last %>"></form>
+            <form method="post" action="/product/<%= p.id %>" style="display: inline">
+              <input class="quantity" type="hidden" name="quantity" value="1">
+              <input type="submit" value="<%= p.name %>" class="btn <%= p.style %> large my-btn" style="margin-top:10px; <%= "margin-right: 45px" unless p == @products.last %>">
+            </form>
           <% end %>
         </div>
       </div>

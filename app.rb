@@ -56,6 +56,7 @@ class ConsumptionRecord
   property :created_at,   DateTime
   #property :type,         String, :required => true   # Add new types here and on the views (they're hardcoded)
   property :price,        Float, :required => true
+  property :batch,        Boolean, :default => false
   
   belongs_to :user
   belongs_to :product
@@ -148,14 +149,15 @@ end
 
 post '/product/:id' do |id|
   halt 404 if (prod = Product.get(id)).nil?
-  
+  n = ((1..5).include? params[:quantity].to_i) ? params[:quantity].to_i : 1
+
   unless @me
     @users = User.all
-    return erb :login, :locals => {:prod_id => id}
+    return erb :login, :locals => {:prod_id => id, :quantity => n}
   end
   
   @products = Product.all
-  @me.consumptionRecords.create(:product => prod, :price => prod.price)
+  n.times.each { @me.consumptionRecords.create(:product => prod, :price => prod.price, :batch => n != 1) }
   
   erb :done, :locals => {:confirmation_msg => ["Registado.", "Ok, já apontei.", "Done.", "Agora vai trabalhar.", "E Red Bull, não?"].sample}
 end
