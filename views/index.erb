@@ -13,6 +13,28 @@
     
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min.js" type="text/javascript" charset="utf-8"></script>
     
+    <script type="text/javascript">
+      $(document).ready(function() {
+        var num = 0;
+        slide_down(500);
+
+        $("#quantity-slider").click(function() {
+          if (num < 5) {
+            slide_down(0);
+          }
+          else {
+            $("ul", this).animate({top: '-60px'}, 200);
+            num = 1;
+          }
+        });
+
+        function slide_down(d) {
+          $("ul", "#quantity-slider").delay(d).animate({top: '-=60px'}, 200);
+          num += 1;
+        }
+      });
+    </script>
+
     <!-- Le styles -->
     <link href="/css/bootstrap.css" rel="stylesheet">
     <style type="text/css">
@@ -20,7 +42,7 @@
         padding-top: 60px;
       }
       
-      .btn {
+      .my-btn {
         font-size: 20px !important;
         margin-top: -10px;
         width: 125px !important;
@@ -51,6 +73,79 @@
       tr.me {
         background-color: #EEE;
       }
+
+      input#qnt-input {
+        height: 74px;
+        vertical-align: baseline;
+        font-size: 60px;
+        font-weight: bold;
+        color: #404040;
+        width: 35px;
+        padding-top: 0px;
+        padding-bottom: 0px;
+        width: 51px;
+        height: 76px;
+        padding: 0px;
+        margin: 0px;
+      }
+
+      ul {
+        /*height: 60px;*/
+        display: inline-block;
+        /*overflow: hidden;*/
+        vertical-align: middle;
+        /*border: 1px solid black;*/
+        margin: 0px;
+        padding: 0px;
+        position: relative;
+        width: 35px;
+        vertical-align: middle;
+      }
+
+      li {
+        list-style: none;
+        height: 60px;
+        color: #404040;
+        font-weight: bold;
+        font-size: 60px;
+        line-height: 48px;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        -o-user-select: none;
+        user-select: none;
+      }
+
+      #quantity-slider {
+        height: 60px;
+        overflow: hidden;
+        /*border: 1px solid black;*/
+        display: inline-block;
+        position: relative;
+        width: 35px;
+        vertical-align: middle;
+        cursor: pointer;
+        margin-left: 16px;
+      }
+
+      #quantity-slider:hover, #quantity-slider > ul {
+        cursor: pointer;
+      }
+
+      .hero-title {
+        float: left;
+      }
+
+      .hero-lame {
+        margin: 0 auto;
+        width: 341px;
+      }
+
+      #quantity-slider li > h1 {
+        color: #d03737;
+      }
     </style>
     
     <!-- Le fav and touch icons -->
@@ -66,11 +161,18 @@
       
       <!-- Main hero unit for a primary marketing message or call to action -->
       <div class="hero-unit">
-        <h1 style="text-align: center">O que foste buscar?</h1>
+        <div class="hero-lame">
+          <h1 class="hero-title">Fui buscar</h1>
+          <div id="quantity-slider">
+            <ul>
+              <%= (0..5).map { |i| "<li><h1>#{i}</h1></li>" }.join("\n") %>
+            </ul>
+          </div>
+        </div>
         
         <div class="row" style="margin: 40px auto 0px auto; text-align: center">
           <% @products.each do |p| %>
-            <form method="post" action="/product/<%= p.id %>" style="display: inline"><input type="submit" value="<%= p.name %>" class="btn <%= p.style %> large" style="margin-top:10px;<%= "margin-right: 45px" unless p == @products.last %>"></form>
+            <form method="post" action="/product/<%= p.id %>" style="display: inline"><input type="submit" value="<%= p.name %>" class="btn <%= p.style %> large my-btn" style="margin-top:10px; <%= "margin-right: 45px" unless p == @products.last %>"></form>
           <% end %>
         </div>
       </div>
