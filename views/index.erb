@@ -47,6 +47,7 @@
         font-size: 20px !important;
         margin-top: -10px;
         width: 125px !important;
+        margin: 10px 23px;
       }
       
       .btn.aromatico {
@@ -172,10 +173,10 @@
         </div>
         
         <div class="row" style="margin: 40px auto 0px auto; text-align: center">
-          <% @products.each do |p| %>
+          <% @products.each_with_index do |p, i| %>
             <form method="post" action="/product/<%= p.id %>" style="display: inline">
               <input class="quantity" type="hidden" name="quantity" value="1">
-              <input type="submit" value="<%= p.name %>" class="btn <%= p.style %> large my-btn" style="margin-top:10px; <%= "margin-right: 45px" unless p == @products.last %>">
+              <input type="submit" value="<%= p.name %>" class="btn <%= p.style %> large my-btn">
             </form>
           <% end %>
         </div>
