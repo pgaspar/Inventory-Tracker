@@ -56,7 +56,7 @@
               <% @products.each do |p| %>
                 <tr>
                   <td><b><%= p.name %></b></td>
-                  <td><%= @me.num_records(p) %></td>
+                  <td><%= @me.records_for_product(p).count %></td>
                 </tr>
               <% end %>
               <tr>

@@ -9,12 +9,13 @@ require "sinatra/reloader" if development?
 require 'date'
 require 'rack-datamapper-session'
 
-# Database
+# Database - setup for both local and remote environments
+
 DataMapper.setup(:default, ENV['DATABASE_URL'] || "sqlite3://#{Dir.pwd}/db.sqlite3")
 
-#Session
+# Session - Force session expiration after 2 weeks
 
-use Rack::Session::DataMapper, :expire_after => 15*24*3600 # 2 semanas
+use Rack::Session::DataMapper, :expire_after => 15*24*3600
 
 # Models
 
@@ -25,28 +26,26 @@ class User
   
   has n,   :consumptionRecords
   
-  def records_by_month(month, year)
-    st_time = Date.new(year, month)
-    fin_time = st_time.next_month
-    consumptionRecords.all(:created_at => (st_time.to_time..fin_time.to_time))
+  def monthly_records(month, year)
+    begin_date = Date.new(year, month)
+    end_date = begin_time.next_month
+    consumptionRecords.all(:created_at => (begin_date.to_time .. end_date.to_time))
   end
   
-  # Some utility methods - naming sucks.
+  # Some utility methods - naming could be improved.
   
-  def records(product)
+  def records_for_product(product)
     consumptionRecords.all(:product => product)
   end
   
-  def num_records(product)
-    consumptionRecords.all(:product => product).size
-  end
-  
   def total_price
-    sprintf "%.2f", consumptionRecords.map(&:price).inject(:+) || 0 # Using sprintf to avoid weird float errors (0.5999999 instead of 0.6).
+    total_price_sum = consumptionRecords.map(&:price).inject(:+)
+    sprintf "%.2f", total_price_sum || 0 # Using sprintf to avoid weird float errors (0.5999999 instead of 0.6).
   end
   
   def type_price(product)
-    sprintf "%.2f", records(product).map(&:price).inject(:+) || 0
+    product_price_sum = records_for_product(product).map(&:price).inject(:+)
+    sprintf "%.2f", product_price_sum || 0 # Using sprintf to avoid weird float errors (0.5999999 instead of 0.6).
   end
 end
 
@@ -54,9 +53,8 @@ class ConsumptionRecord
   include DataMapper::Resource
   property :id,           Serial
   property :created_at,   DateTime
-  #property :type,         String, :required => true   # Add new types here and on the views (they're hardcoded)
   property :price,        Float, :required => true
-  property :batch,        Boolean, :default => false
+  property :batch,        Boolean, :default => false    # Batch records should not be used for statistics, since their timestamps are inaccurate.
   
   belongs_to :user
   belongs_to :product
@@ -67,7 +65,7 @@ class Product
   property :id,           Serial
   property :name,         String, :required => true
   property :price,        Float, :required => true
-  property :style,        String
+  property :style,        String                        # Adds specific CSS styling to this product. Currently unused.
   
   has n,   :consumptionRecords
 end
@@ -78,6 +76,7 @@ DataMapper.auto_upgrade!
 # Controllers
 
 before do
+  # Get current user from session before doing anything.
   @me = User.get(session[:user]) if session[:user]
 end
 
@@ -86,6 +85,40 @@ get '/' do
   @products = Product.all
   erb :index
 end
+
+post '/login' do
+  session[:user] = User.get(params[:id]).id                       # Make sure the selected user exists and save its id to session.
+  call env.merge("PATH_INFO" => '/product/' + params[:prod_id])   # After-login redirect to the requested product page.
+end
+
+get '/logout' do
+  session.clear
+  redirect '/'
+end
+
+post '/product/:id' do |id|
+  prod = Product.get(id)
+  halt 404 if prod.nil?
+
+  quantity = params[:quantity].to_i
+  quantity = 1 unless (1..5).include?(quantity)   # Make sure quantity is within the [1, 5] integer interval (this is hardcoded).
+
+  # Force login if no user in session.
+  unless @me
+    @users = User.all
+    return erb :login, :locals => {:prod_id => id, :quantity => quantity}
+  end
+  
+  # Create 'quantity' number of consumption records.
+  quantity.times.each do
+    @me.consumptionRecords.create(:product => prod, :price => prod.price, :batch => quantity != 1)
+  end
+  
+  @products = Product.all
+  erb :done, :locals => {:confirmation_msg => ["Registado.", "Ok, já apontei.", "Done.", "Agora vai trabalhar.", "E Red Bull, não?"].sample}
+end
+
+# Admin actions
 
 get '/admin' do
   protected!
@@ -135,31 +168,6 @@ post '/admin/product/:id/edit' do |id|
   protected!
   Product.get(id).update(:name => params[:name], :price => params[:price], :style => params[:style])
   redirect '/admin'
-end
-
-post '/login' do
-  session[:user] = User.get(params[:id]).id
-  call env.merge("PATH_INFO" => '/product/' + params[:prod_id])
-end
-
-get '/logout' do
-  session.clear
-  redirect '/'
-end
-
-post '/product/:id' do |id|
-  halt 404 if (prod = Product.get(id)).nil?
-  n = ((1..5).include? params[:quantity].to_i) ? params[:quantity].to_i : 1
-
-  unless @me
-    @users = User.all
-    return erb :login, :locals => {:prod_id => id, :quantity => n}
-  end
-  
-  @products = Product.all
-  n.times.each { @me.consumptionRecords.create(:product => prod, :price => prod.price, :batch => n != 1) }
-  
-  erb :done, :locals => {:confirmation_msg => ["Registado.", "Ok, já apontei.", "Done.", "Agora vai trabalhar.", "E Red Bull, não?"].sample}
 end
 
 # Helpers

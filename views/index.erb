@@ -198,7 +198,7 @@
               <tr <%= "class='me'" if u == @me %>>
                 <td><%= u.name %></td>
                 <% @products.each do |p| %>
-                  <td><%= u.num_records(p) %></td>
+                  <td><%= u.records_for_product(p).count %></td>
                 <% end %>
                 <td><%= u.total_price %>€</td>
               </tr>
